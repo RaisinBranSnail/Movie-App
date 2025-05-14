@@ -11,15 +11,334 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
+    padding: 20px;
 }
 
 .auth-container {
     width: 100%;
-    max-width: 400px;
-    padding: 40px;
+    max-width: 500px;
+}
+
+.auth-card {
     background-color: #1f1f1f;
     border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-header h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.auth-header p {
+    color: #aaa;
+    font-size: 18px;
+}
+
+/* Modern card style for profile setup */
+.modern-card {
+    background-color: #1A1A1A;
+    padding: 40px 30px;
+    border-radius: 15px;
+}
+
+.modern-form .form-group {
+    margin-bottom: 25px;
+}
+
+.modern-form label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 0px;
+    color: #fff;
+}
+
+/* Profile picture upload */
+.profile-upload {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.profile-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #2d2d2d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.profile-avatar i {
+    font-size: 32px;
+    color: #666;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upload-btn {
+    background-color: transparent;
+    border: 1px solid #e91e63;
+    color: #e91e63;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-btn:hover {
+    background-color: rgba(233, 30, 99, 0.1);
+}
+
+/* Textarea for bio */
+.modern-form textarea {
+    width: 100%;
+    padding: 16px;
+    border-radius: 10px;
+    background-color: #2d2d2d;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    resize: vertical;
+    min-height: 100px;
+}
+
+.modern-form textarea::placeholder {
+    color: #888;
+}
+
+/* Genre selector */
+.genre-selector {
+    position: relative;
+}
+
+.genre-select-box {
+    background-color: #2d2d2d;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.selected-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    color: #888;
+    position: relative;
+}
+
+.selected-option i {
+    color: #888;
+    transition: transform 0.3s ease;
+}
+
+.genre-count {
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #e91e63;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.genre-tag {
+    background-color: #3d3d3d;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    margin-bottom: 5px;
+}
+
+.genre-tag:hover {
+    background-color: #4d4d4d;
+}
+
+.genre-tag.selected {
+    background-color: #3d3d3d;
+    color: white;
+}
+
+.genre-tag.selected::before {
+    content: '✓';
+    margin-right: 6px;
+    color: #e91e63;
+    font-weight: bold;
+}
+
+.genre-tag input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/* Date input */
+.date-input {
+    position: relative;
+}
+
+.date-input input[type="date"] {
+    width: 100%;
+    padding: 16px;
+    border-radius: 10px;
+    background-color: #2d2d2d;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    appearance: none;
+}
+
+.date-input input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+}
+
+.date-input i {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    pointer-events: none;
+}
+
+/* Select wrapper */
+.select-wrapper {
+    position: relative;
+}
+
+.select-wrapper select {
+    width: 100%;
+    padding: 16px;
+    border-radius: 10px;
+    background-color: #2d2d2d;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    appearance: none;
+    cursor: pointer;
+}
+
+.select-wrapper select option {
+    background-color: #2d2d2d;
+    color: #fff;
+}
+
+.select-wrapper i {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    pointer-events: none;
+}
+
+/* Complete profile button */
+.complete-btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 25px;
+    background-color: #e91e63;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.complete-btn:hover {
+    background-color: #d81b60;
+}
+
+.skip-link {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    color: #aaa;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.skip-link:hover {
+    color: #e91e63;
+}
+
+/* Flash messages */
+.flash-messages {
+    margin-bottom: 20px;
+}
+
+.flash {
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.flash.success {
+    background-color: rgba(39, 174, 96, 0.2);
+    color: #2ecc71;
+    border: 1px solid #2ecc71;
+}
+
+.flash.error {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+}
+
+.flash.info {
+    background-color: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+    border: 1px solid #3498db;
+}
+
+/* Original auth form styles */
+.auth-form {
+    width: 100%;
 }
 
 .auth-form h1 {
@@ -28,17 +347,17 @@ body {
     font-size: 28px;
 }
 
-.form-group {
+.auth-form .form-group {
     margin-bottom: 25px;
 }
 
-.form-group label {
+.auth-form .form-group label {
     display: block;
     margin-bottom: 8px;
     font-size: 16px;
 }
 
-.form-group input {
+.auth-form .form-group input:not([type="checkbox"]) {
     width: 100%;
     padding: 14px;
     border: none;
@@ -81,32 +400,79 @@ body {
     text-decoration: underline;
 }
 
-/* Flash messages */
-.flash-messages {
-    margin-bottom: 20px;
+/* Profile editing page styles */
+.profile-card {
+    max-width: 600px;
 }
 
-.flash {
-    padding: 10px 15px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    font-size: 14px;
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
 }
 
-.flash.success {
-    background-color: rgba(39, 174, 96, 0.2);
-    color: #2ecc71;
-    border: 1px solid #2ecc71;
+.cancel-button {
+    display: inline-block;
+    background-color: transparent;
+    color: #aaa;
+    padding: 12px 20px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.3s ease;
 }
 
-.flash.error {
-    background-color: rgba(231, 76, 60, 0.2);
-    color: #e74c3c;
-    border: 1px solid #e74c3c;
+.cancel-button:hover {
+    background-color: #333;
+    color: #fff;
 }
 
-.flash.info {
-    background-color: rgba(52, 152, 219, 0.2);
-    color: #3498db;
-    border: 1px solid #3498db;
+.genre-tags {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    right: 0;
+    background-color: #2d2d2d;
+    border-radius: 10px;
+    z-index: 100;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    max-height: 0;
+    padding: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.genre-tags.show {
+    max-height: 300px;
+    padding: 15px;
+    opacity: 1;
+    pointer-events: auto;
+    display: grid;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #e91e63 #3d3d3d;
+}
+
+/* Custom scrollbar styling for WebKit browsers (Chrome, Safari) */
+.genre-tags.show::-webkit-scrollbar {
+    width: 8px;
+}
+
+.genre-tags.show::-webkit-scrollbar-track {
+    background: #3d3d3d;
+    border-radius: 10px;
+}
+
+.genre-tags.show::-webkit-scrollbar-thumb {
+    background-color: #e91e63;
+    border-radius: 10px;
+    border: 2px solid #3d3d3d;
 } 

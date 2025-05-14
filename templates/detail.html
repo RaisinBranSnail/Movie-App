@@ -3,48 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie App</title>
+    <title>{{ title }} - Movie App</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='detail.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="/">Movie App</a>
+            </div>
+            <div class="search-container">
+                <form action="/search" method="GET">
+                    <input type="text" name="query" placeholder="Search for movies or TV shows...">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="#">Movies</a></li>
+                    <li><a href="#">TV Shows</a></li>
+                    {% if session.get('user') %}
+                        <li><a href="/watchlist">Watchlist</a></li>
+                        <li class="user-menu">
+                            <span class="user-email">{{ session['user']['email'] }}</span>
+                            <a href="/logout" class="logout-btn">Logout</a>
+                        </li>
+                    {% else %}
+                        <li><a href="/login" class="auth-link login">Sign In</a></li>
+                        <li><a href="/signup" class="auth-link signup">Sign Up</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
     <div class="app-container">
         <nav class="sidebar">
-            <div class="nav-item active">
+            <div class="nav-item">
                 <a href="/">Browse</a>
             </div>
+            <div class="nav-item">
+                <a href="#">Movies</a>
+            </div>
+            <div class="nav-item">
+                <a href="#">TV Shows</a>
+            </div>
+            {% if session.get('user') %}
+            <div class="nav-item">
+                <a href="/watchlist">My Watchlist</a>
+            </div>
+            {% endif %}
         </nav>
         
-        <main class="content">         
-            <div class="search-bar">
-                <input type="text" placeholder="Search for movies...">
-                <div class="auth-links">
-                    {% if session.get('user') %}
-                        <span class="user-email">{{ session['user']['email'] }}</span>
-                        <a href="/logout" class="auth-link">Logout</a>
-                    {% else %}
-                        <a href="/login" class="auth-link">Sign In</a>
-                        <a href="/signup" class="auth-link">Sign Up</a>
-                    {% endif %}
-                </div>
-            </div>
+        <main class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
             <div class="detail-card">
                 {% for category_name, category_data in tmdb_data.items() %}
                     {% for m in category_data['results'][0:18] %}
                         {% if m.title|default(m.name) == title %}
-
-                        <div class="default-poster">
-                            <img src="https://image.tmdb.org/t/p/w300{{ m.poster_path }}" alt="{{ m.title|default(m.name) }}">
+                        <div class="detail-poster">
+                            <img src="https://image.tmdb.org/t/p/w500{{ m.poster_path }}" alt="{{ m.title|default(m.name) }}">
                         </div>
                         <div class="detail-info">
-                            <h3>{{ m.title|default(m.name) }}</h3>
-                            <div class="rating">
-                                <i class="fas fa-star"></i>
-                                <span>{{ m.vote_average|round(1) }}/10</span>
+                            <h1>{{ m.title|default(m.name) }}</h1>
+                            
+                            <div class="detail-meta">
+                                <div class="rating">
+                                    <i class="fas fa-star"></i>
+                                    <span>{{ m.vote_average|round(1) }}/10</span>
+                                </div>
+                                <div class="release-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>{{ m.release_date|default(m.first_air_date, '') }}</span>
+                                </div>
                             </div>
+                            
+                            <div class="detail-actions">
+                                {% if session.get('user') %}
+                                <button class="watchlist-btn" data-movie-id="{{ m.id }}">
+                                    <i class="fas fa-bookmark"></i> Add to Watchlist
+                                </button>
+                                {% else %}
+                                <a href="/login" class="login-to-save">
+                                    <i class="fas fa-user"></i> Log in to save
+                                </a>
+                                {% endif %}
+                            </div>
+
                             <div class="detail-overview">
-                                <span>{{ m.overview}}</span>
+                                <h3>Overview</h3>
+                                <p>{{ m.overview }}</p>
                             </div>
+                            
+                            <!-- Rating section -->
+                            {% if session.get('user') %}
+                            <div class="rating-section">
+                                <h3>Your Rating</h3>
+                                <div class="rating-input">
+                                    <div class="star-rating">
+                                        {% for i in range(1, 11) %}
+                                        <span class="rate-star" data-value="{{ i }}">
+                                            <i class="far fa-star"></i>
+                                        </span>
+                                        {% endfor %}
+                                    </div>
+                                    <button class="submit-rating" data-movie-id="{{ m.id }}">Rate</button>
+                                </div>
+                                <div class="rating-form">
+                                    <textarea placeholder="Write your review (optional)" class="review-text"></textarea>
+                                </div>
+                            </div>
+                            {% endif %}
                         </div>
                         {% endif %}
                     {% endfor %}
@@ -52,5 +132,106 @@
             </div>
         </main>
     </div>
+
+    <script>
+        // Watchlist add functionality
+        const watchlistBtn = document.querySelector('.watchlist-btn');
+        if (watchlistBtn) {
+            watchlistBtn.addEventListener('click', async () => {
+                const movieId = watchlistBtn.dataset.movieId;
+                try {
+                    const response = await fetch(`/watchlist/add/${movieId}`, {
+                        method: 'POST'
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        watchlistBtn.innerHTML = '<i class="fas fa-check"></i> Added to Watchlist';
+                        watchlistBtn.classList.add('added');
+                        watchlistBtn.disabled = true;
+                    } else {
+                        alert(result.message);
+                    }
+                } catch (error) {
+                    console.error('Error adding to watchlist:', error);
+                }
+            });
+        }
+        
+        // Rating functionality
+        const rateStars = document.querySelectorAll('.rate-star');
+        const submitRating = document.querySelector('.submit-rating');
+        const reviewText = document.querySelector('.review-text');
+        
+        let currentRating = 0;
+        
+        rateStars.forEach(star => {
+            star.addEventListener('mouseover', () => {
+                const value = parseInt(star.dataset.value);
+                
+                rateStars.forEach(s => {
+                    const starValue = parseInt(s.dataset.value);
+                    if (starValue <= value) {
+                        s.querySelector('i').className = 'fas fa-star';
+                    } else {
+                        s.querySelector('i').className = 'far fa-star';
+                    }
+                });
+            });
+            
+            star.addEventListener('mouseout', () => {
+                rateStars.forEach(s => {
+                    const starValue = parseInt(s.dataset.value);
+                    if (starValue <= currentRating) {
+                        s.querySelector('i').className = 'fas fa-star';
+                    } else {
+                        s.querySelector('i').className = 'far fa-star';
+                    }
+                });
+            });
+            
+            star.addEventListener('click', () => {
+                currentRating = parseInt(star.dataset.value);
+            });
+        });
+        
+        if (submitRating) {
+            submitRating.addEventListener('click', async () => {
+                if (currentRating === 0) {
+                    alert('Please select a rating');
+                    return;
+                }
+                
+                const movieId = submitRating.dataset.movieId;
+                const review = reviewText.value;
+                
+                try {
+                    const response = await fetch('/api/ratings', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            movie_id: movieId,
+                            rating: currentRating,
+                            review: review
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        alert('Rating submitted successfully!');
+                        reviewText.value = '';
+                    } else {
+                        alert(result.message);
+                    }
+                } catch (error) {
+                    console.error('Error submitting rating:', error);
+                }
+            });
+        }
+    </script>
 </body>
 </html>

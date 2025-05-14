@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Your Profile - Movie App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card modern-card">
+            <div class="auth-header">
+                <h1>Complete Your Profile</h1>
+                <p>Help us personalize your experience</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('profile_setup') }}" method="POST" enctype="multipart/form-data" class="modern-form">
+                <div class="form-group">
+                    <label for="profile_picture">Profile Picture</label>
+                    <div class="profile-upload">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <button type="button" class="upload-btn" id="upload-trigger">Upload</button>
+                        <input type="file" id="profile_picture" name="profile_picture" accept="image/*" hidden>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="bio">Bio</label>
+                    <textarea id="bio" name="bio" rows="3" placeholder="Tell us about yourself"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Preferred Genres</label>
+                    <div class="genre-selector">
+                        <div class="genre-select-box">
+                            <div class="selected-option">
+                                <span>Select genres</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="genre-tags">
+                            {% for genre in genres %}
+                            <div class="genre-tag" data-id="{{ genre.id }}">
+                                <input type="checkbox" id="genre-{{ genre.id }}" name="preferred_genres" value="{{ genre.id }}" hidden>
+                                <span>{{ genre.name }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="date_of_birth">Date of Birth</label>
+                    <div class="date-input">
+                        <input type="date" id="date_of_birth" name="date_of_birth">
+                        <i class="far fa-calendar-alt"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="country">Country</label>
+                    <div class="select-wrapper">
+                        <select id="country" name="country">
+                            <option value="">Select country</option>
+                            {% for country in countries %}
+                            <option value="{{ country }}">{{ country }}</option>
+                            {% endfor %}
+                        </select>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                
+                <button type="submit" class="complete-btn">Complete Profile</button>
+                <a href="{{ url_for('landing') }}" class="skip-link">Skip for now</a>
+                <hr>
+                <button type="submit" formaction="{{ url_for('profile_setup_rpc') }}" class="btn btn-secondary">Save Profile (RPC Method)</button>
+                <button type="submit" formaction="{{ url_for('profile_setup_service') }}" class="btn btn-secondary">Save Profile (Service Role Method)</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Handle profile picture upload button
+        document.getElementById('upload-trigger').addEventListener('click', function() {
+            document.getElementById('profile_picture').click();
+        });
+
+        // Preview selected profile picture
+        document.getElementById('profile_picture').addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const avatar = document.querySelector('.profile-avatar');
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    avatar.innerHTML = `<img src="${e.target.result}" alt="Profile Preview">`;
+                }
+                
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        // Toggle genre dropdown
+        const selectedOption = document.querySelector('.selected-option');
+        const genreTags = document.querySelector('.genre-tags');
+        
+        // Ensure dropdown height doesn't exceed viewport
+        function adjustDropdownHeight() {
+            const dropdown = document.querySelector('.genre-tags');
+            if (!dropdown) return;
+            
+            const viewportHeight = window.innerHeight;
+            const dropdownRect = dropdown.getBoundingClientRect();
+            const dropdownTop = dropdownRect.top;
+            
+            // Calculate maximum available height (leave some margin at bottom)
+            const maxHeight = viewportHeight - dropdownTop - 40;
+            
+            // Set max height based on available space
+            if (maxHeight < 300) {
+                dropdown.style.maxHeight = `${maxHeight}px`;
+            } else {
+                dropdown.style.maxHeight = '300px';
+            }
+        }
+
+        // Call this when toggle dropdown
+        selectedOption.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            genreTags.classList.toggle('show');
+            
+            if (genreTags.classList.contains('show')) {
+                adjustDropdownHeight();
+            }
+            
+            // Rotate chevron icon when dropdown is open
+            const icon = this.querySelector('i');
+            if (genreTags.classList.contains('show')) {
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                icon.style.transform = 'rotate(0)';
+            }
+        });
+
+        // Also adjust dropdown on window resize
+        window.addEventListener('resize', function() {
+            if (genreTags.classList.contains('show')) {
+                adjustDropdownHeight();
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!selectedOption.contains(e.target) && !genreTags.contains(e.target)) {
+                genreTags.classList.remove('show');
+                selectedOption.querySelector('i').style.transform = 'rotate(0)';
+            }
+        });
+
+        // Improved genre selection handler
+        document.querySelectorAll('.genre-tag').forEach(tag => {
+            tag.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Toggle the selected visual class
+                this.classList.toggle('selected');
+                
+                // Find and toggle the checkbox
+                const genreId = this.dataset.id;
+                const checkbox = document.getElementById(`genre-${genreId}`);
+                if (checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                }
+                
+                // Update selected genre display
+                updateSelectedGenres();
+            });
+        });
+        
+        // Update selected genres display
+        function updateSelectedGenres() {
+            const selectedTags = document.querySelectorAll('.genre-tag.selected');
+            const count = selectedTags.length;
+            
+            // Create display text based on selection count
+            let displayText = 'Select genres';
+            
+            if (count === 1) {
+                displayText = selectedTags[0].querySelector('span').textContent;
+            } else if (count > 1) {
+                displayText = `${count} genres selected`;
+            }
+            
+            // Update the displayed text
+            document.querySelector('.selected-option span').textContent = displayText;
+            
+            // Add a visual indicator for the number of selected items
+            const option = document.querySelector('.selected-option');
+            
+            // Remove existing badge if any
+            const existingBadge = option.querySelector('.genre-count');
+            if (existingBadge) {
+                existingBadge.remove();
+            }
+            
+            // Add badge if items are selected
+            if (count > 0) {
+                const badge = document.createElement('div');
+                badge.className = 'genre-count';
+                badge.textContent = count;
+                option.appendChild(badge);
+            }
+        }
+    </script>
+</body>
+</html> 

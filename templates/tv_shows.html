@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV Shows - Movie App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .filter-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #1f1f1f;
+            border-radius: 10px;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .filter-select {
+            padding: 10px 15px;
+            background-color: #2d2d2d;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .sort-by {
+            padding: 10px 15px;
+            background-color: #2d2d2d;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .filter-label {
+            font-size: 14px;
+            color: #aaa;
+        }
+        
+        .page-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .page-title h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+        
+        .page-title .icon {
+            margin-right: 15px;
+            color: #e91e63;
+            font-size: 28px;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="/">Movie App</a>
+            </div>
+            <div class="search-container">
+                <form action="/search" method="GET">
+                    <input type="text" name="query" placeholder="Search for movies or TV shows...">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="{{ url_for('movies') }}">Movies</a></li>
+                    <li><a href="{{ url_for('tv_shows') }}" class="active">TV Shows</a></li>
+                    {% if session.get('user') %}
+                        <li><a href="{{ url_for('watchlist') }}">Watchlist</a></li>
+                        <li class="user-menu">
+                            <span class="user-email">{{ session['user']['email'] }}</span>
+                            <div class="user-dropdown">
+                                <a href="{{ url_for('profile') }}" class="dropdown-item">Profile</a>
+                                <a href="{{ url_for('logout') }}" class="dropdown-item">Logout</a>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li><a href="/login" class="auth-link login">Sign In</a></li>
+                        <li><a href="/signup" class="auth-link signup">Sign Up</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="app-container">
+        <nav class="sidebar">
+            <div class="nav-item">
+                <a href="/">Browse</a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('movies') }}">Movies</a>
+            </div>
+            <div class="nav-item active">
+                <a href="{{ url_for('tv_shows') }}">TV Shows</a>
+            </div>
+            {% if session.get('user') %}
+            <div class="nav-item">
+                <a href="{{ url_for('watchlist') }}">My Watchlist</a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('profile') }}">My Profile</a>
+            </div>
+            {% endif %}
+        </nav>
+        
+        <main class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <div class="page-title">
+                <i class="fas fa-tv icon"></i>
+                <h1>TV Shows</h1>
+            </div>
+            
+            <div class="filter-container">
+                <div class="filter-group">
+                    <span class="filter-label">Genre:</span>
+                    <select class="filter-select">
+                        <option value="">All Genres</option>
+                        {% for genre in genres %}
+                            <option value="{{ genre.id }}">{{ genre.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <span class="filter-label">Sort by:</span>
+                    <select class="sort-by">
+                        <option value="popularity.desc">Popularity</option>
+                        <option value="vote_average.desc">Rating</option>
+                        <option value="first_air_date.desc">Air Date</option>
+                        <option value="name.asc">Title A-Z</option>
+                    </select>
+                </div>
+            </div>
+            
+            {% for category_name, category_data in tv_data.items() %}
+            <section class="section">
+                <div class="section-header">
+                    <h2>{{ category_name.replace('_', ' ').replace('tv', '').title() }}</h2>
+                </div>
+                <div class="movie-grid">
+                    {% for show in category_data['results'][0:10] %}
+                    <a href="{{ url_for('detail', title=show.name) }}">  
+                    <div class="movie-card">
+                        <div class="movie-poster">
+                          <img src="https://image.tmdb.org/t/p/w300{{ show.poster_path }}" alt="{{ show.name }}">
+                        </div>
+                        <div class="movie-info">
+                          <h3>{{ show.name }}</h3>
+                          <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <span>{{ show.vote_average|round(1) }}/10</span>
+                          </div>
+                          <div class="release-date">
+                            {{ show.first_air_date }}
+                          </div>
+                        </div>
+                    </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endfor %}
+        </main>
+    </div>
+
+    <script>
+        // You can add JavaScript for filtering and sorting functionality here
+        document.querySelector('.filter-select').addEventListener('change', function() {
+            // Filter functionality to be implemented
+            console.log('Filter by genre:', this.value);
+        });
+        
+        document.querySelector('.sort-by').addEventListener('change', function() {
+            // Sorting functionality to be implemented
+            console.log('Sort by:', this.value);
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - Movie App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="/">Movie App</a>
+            </div>
+            <div class="search-container">
+                <form action="/search" method="GET">
+                    <input type="text" name="query" placeholder="Search for movies or TV shows..." value="{{ search_data.query }}">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="#">Movies</a></li>
+                    <li><a href="#">TV Shows</a></li>
+                    {% if session.get('user') %}
+                        <li><a href="#">Watchlist</a></li>
+                        <li class="user-menu">
+                            <span class="user-email">{{ session['user']['email'] }}</span>
+                            <a href="/logout" class="logout-btn">Logout</a>
+                        </li>
+                    {% else %}
+                        <li><a href="/login" class="auth-link login">Sign In</a></li>
+                        <li><a href="/signup" class="auth-link signup">Sign Up</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="app-container">
+        <nav class="sidebar">
+            <div class="nav-item">
+                <a href="/">Browse</a>
+            </div>
+            <div class="nav-item">
+                <a href="#">Movies</a>
+            </div>
+            <div class="nav-item">
+                <a href="#">TV Shows</a>
+            </div>
+            {% if session.get('user') %}
+            <div class="nav-item">
+                <a href="#">My Watchlist</a>
+            </div>
+            {% endif %}
+        </nav>
+        
+        <main class="content">
+            <div class="search-results-header">
+                <h1>Search Results for "{{ search_data.query }}"</h1>
+            </div>
+
+            {% if search_data.movie_results.results %}
+            <section class="section">
+                <div class="section-header">
+                    <h2>Movies</h2>
+                </div>
+                <div class="movie-grid">
+                    {% for movie in search_data.movie_results.results %}
+                    {% if movie.poster_path %}
+                    <a href="{{ url_for('detail', title=movie.title) }}">  
+                        <div class="movie-card">
+                            <div class="movie-poster">
+                                <img src="https://image.tmdb.org/t/p/w300{{ movie.poster_path }}" alt="{{ movie.title }}">
+                            </div>
+                            <div class="movie-info">
+                                <h3>{{ movie.title }}</h3>
+                                <div class="rating">
+                                    <i class="fas fa-star"></i>
+                                    <span>{{ movie.vote_average|round(1) }}/10</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            {% if search_data.tv_results.results %}
+            <section class="section">
+                <div class="section-header">
+                    <h2>TV Shows</h2>
+                </div>
+                <div class="movie-grid">
+                    {% for show in search_data.tv_results.results %}
+                    {% if show.poster_path %}
+                    <a href="{{ url_for('detail', title=show.name) }}">  
+                        <div class="movie-card">
+                            <div class="movie-poster">
+                                <img src="https://image.tmdb.org/t/p/w300{{ show.poster_path }}" alt="{{ show.name }}">
+                            </div>
+                            <div class="movie-info">
+                                <h3>{{ show.name }}</h3>
+                                <div class="rating">
+                                    <i class="fas fa-star"></i>
+                                    <span>{{ show.vote_average|round(1) }}/10</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            {% if not search_data.movie_results.results and not search_data.tv_results.results %}
+            <div class="no-results">
+                <p>No results found for "{{ search_data.query }}". Please try a different search term.</p>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html> 

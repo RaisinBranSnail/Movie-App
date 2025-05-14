@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Profile - Movie App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            padding-top: 0;
+            display: block;
+        }
+        
+        .profile-page-container {
+            max-width: 800px;
+            width: 100%;
+            margin: 30px auto;
+            padding: 0 15px;
+        }
+        
+        .auth-card {
+            margin-top: 20px;
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+        
+        .profile-picture {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #2d2d2d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .profile-picture i {
+            font-size: 50px;
+            color: #666;
+        }
+        
+        .profile-picture img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-info {
+            flex: 1;
+        }
+        
+        .profile-info h2 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .profile-info .email {
+            color: #aaa;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+        
+        .stat-card {
+            background-color: #2d2d2d;
+            border-radius: 10px;
+            padding: 20px;
+            flex: 1;
+            text-align: center;
+            border-left: 3px solid #e91e63;
+        }
+        
+        .stat-card h3 {
+            font-size: 32px;
+            margin-bottom: 5px;
+            color: #e91e63;
+        }
+        
+        .stat-card p {
+            color: #aaa;
+            font-size: 14px;
+        }
+        
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .tab-button {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: #aaa;
+            font-size: 16px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .tab-button.active {
+            color: #fff;
+        }
+        
+        .tab-button.active:after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #e91e63;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .genre-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .genre-pill {
+            background-color: #3d3d3d;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .bio-section {
+            background-color: #2d2d2d;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .bio-section h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+            color: #e91e63;
+        }
+        
+        .section-title {
+            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .primary-button {
+            background-color: #e91e63;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .primary-button:hover {
+            background-color: #c1134e;
+            transform: translateY(-2px);
+        }
+        
+        .secondary-button {
+            background-color: transparent;
+            color: #e91e63;
+            border: 1px solid #e91e63;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .secondary-button:hover {
+            background-color: rgba(233, 30, 99, 0.1);
+        }
+        
+        .profile-form {
+            padding: 30px;
+            background-color: #2d2d2d;
+            border-radius: 10px;
+        }
+        
+        .genre-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .genre-checkbox {
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .genre-checkbox input {
+            margin-right: 5px;
+        }
+        
+        /* Reviews styles */
+        .reviews-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .review-card {
+            background-color: #2d2d2d;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 3px solid #e91e63;
+        }
+        
+        .review-movie {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .movie-poster-small {
+            width: 80px;
+            height: 120px;
+            border-radius: 5px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .movie-poster-small img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .movie-details {
+            flex: 1;
+        }
+        
+        .movie-details h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .user-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .stars {
+            color: #ffca28;
+        }
+        
+        .review-date {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .review-content {
+            margin: 15px 0;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .review-actions {
+            text-align: right;
+        }
+        
+        .text-button {
+            background: none;
+            border: none;
+            color: #e91e63;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 5px 10px;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+        
+        .text-button:hover {
+            opacity: 1;
+        }
+        
+        /* Empty content */
+        .empty-content {
+            text-align: center;
+            padding: 50px 20px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .empty-content i {
+            font-size: 48px;
+            color: #e91e63;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+        
+        .empty-content h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .empty-content p {
+            color: #aaa;
+            margin-bottom: 20px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Make watchlist items responsive */
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .remove-form {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="/">Movie App</a>
+            </div>
+            <div class="search-container">
+                <form action="/search" method="GET">
+                    <input type="text" name="query" placeholder="Search for movies or TV shows...">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="{{ url_for('movies') }}">Movies</a></li>
+                    <li><a href="{{ url_for('tv_shows') }}">TV Shows</a></li>
+                    {% if session.get('user') %}
+                        <li><a href="{{ url_for('watchlist') }}">Watchlist</a></li>
+                        <li class="user-menu">
+                            <span class="user-email">{{ session['user']['email'] }}</span>
+                            <div class="user-dropdown">
+                                <a href="{{ url_for('profile') }}" class="dropdown-item active">Profile</a>
+                                <a href="{{ url_for('logout') }}" class="dropdown-item">Logout</a>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li><a href="/login" class="auth-link login">Sign In</a></li>
+                        <li><a href="/signup" class="auth-link signup">Sign Up</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="profile-page-container">
+        <div class="auth-card modern-card">
+            <div class="profile-header">
+                <div class="profile-picture">
+                    {% if user_profile and user_profile.profile_picture %}
+                        <img src="{{ user_profile.profile_picture }}" alt="Profile Picture">
+                    {% else %}
+                        <i class="fas fa-user"></i>
+                    {% endif %}
+                </div>
+                <div class="profile-info">
+                    <h2>{{ session['user']['email'].split('@')[0]|title }}</h2>
+                    <div class="email">{{ session['user']['email'] }}</div>
+                    <div class="genre-pills">
+                        {% if selected_genre_ids %}
+                            {% for genre in genres %}
+                                {% if genre.id|string in selected_genre_ids %}
+                                    <div class="genre-pill">{{ genre.name }}</div>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <div class="genre-pill">No genres selected</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>{{ watchlist_count }}</h3>
+                    <p>Watchlist Items</p>
+                </div>
+                <div class="stat-card">
+                    <h3>{{ ratings_count }}</h3>
+                    <p>Reviews</p>
+                </div>
+                <div class="stat-card">
+                    <h3>{{ user_profile.country if user_profile and user_profile.country else 'N/A' }}</h3>
+                    <p>Country</p>
+                </div>
+            </div>
+            
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-button active" data-tab="profile">Profile</button>
+                    <button class="tab-button" data-tab="watchlist">Watchlist ({{ watchlist_count }})</button>
+                    <button class="tab-button" data-tab="reviews">Reviews ({{ ratings_count }})</button>
+                    <button class="tab-button" data-tab="edit">Edit Profile</button>
+                </div>
+                
+                <div class="tab-content active" id="profile-tab">
+                    {% if user_profile %}
+                        <div class="bio-section">
+                            <h3>About Me</h3>
+                            <p>{{ user_profile.bio if user_profile.bio else 'No bio provided.' }}</p>
+                        </div>
+                        
+                        <div class="section-title">Personal Information</div>
+                        <div class="info-group">
+                            <p><strong>Date of Birth:</strong> {{ user_profile.date_of_birth if user_profile.date_of_birth else 'Not provided' }}</p>
+                            <p><strong>Country:</strong> {{ user_profile.country if user_profile.country else 'Not provided' }}</p>
+                            <p><strong>Member Since:</strong> {{ user_profile.created_at.split('T')[0] if user_profile.created_at else 'Unknown' }}</p>
+                        </div>
+                    {% else %}
+                        <div class="bio-section">
+                            <h3>Profile Not Set Up</h3>
+                            <p>You haven't completed your profile setup yet. Click the "Edit Profile" tab to get started.</p>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="form-actions">
+                        <a href="{{ url_for('watchlist') }}" class="secondary-button">My Watchlist</a>
+                        <a href="{{ url_for('landing') }}" class="secondary-button">Explore Movies</a>
+                    </div>
+                </div>
+                
+                <!-- Watchlist Tab -->
+                <div class="tab-content" id="watchlist-tab">
+                    <div class="section-title">My Watchlist</div>
+                    
+                    {% if watchlist_items %}
+                        <div class="movie-grid">
+                            {% for movie in watchlist_items %}
+                            <div class="movie-card">
+                                <div class="movie-poster">
+                                    <img src="https://image.tmdb.org/t/p/w300{{ movie.poster_path }}" alt="{{ movie.title }}">
+                                    <form action="{{ url_for('profile_remove_from_watchlist', item_id=movie.watchlist_id) }}" method="POST" class="remove-form">
+                                        <button type="submit" class="remove-watchlist" title="Remove from watchlist">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="movie-info">
+                                    <h3>{{ movie.title }}</h3>
+                                    <div class="rating">
+                                        <i class="fas fa-star"></i>
+                                        <span>{{ movie.vote_average|round(1) }}/10</span>
+                                    </div>
+                                    <div class="watchlist-date">
+                                        Added {{ movie.added_date.strftime('%b %d, %Y') }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-content">
+                            <i class="fas fa-film"></i>
+                            <h3>Your watchlist is empty</h3>
+                            <p>Explore movies and add them to your watchlist to keep track of what you want to watch.</p>
+                            <a href="{{ url_for('landing') }}" class="primary-button">Explore Movies</a>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Reviews Tab -->
+                <div class="tab-content" id="reviews-tab">
+                    <div class="section-title">My Reviews</div>
+                    
+                    {% if ratings_items %}
+                        <div class="reviews-container">
+                            {% for movie in ratings_items %}
+                            <div class="review-card">
+                                <div class="review-movie">
+                                    <div class="movie-poster-small">
+                                        <img src="https://image.tmdb.org/t/p/w300{{ movie.poster_path }}" alt="{{ movie.title }}">
+                                    </div>
+                                    <div class="movie-details">
+                                        <h3>{{ movie.title }}</h3>
+                                        <div class="user-rating">
+                                            <div class="stars">
+                                                {% for i in range(1, 6) %}
+                                                    {% if i <= movie.rating %}
+                                                        <i class="fas fa-star"></i>
+                                                    {% else %}
+                                                        <i class="far fa-star"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                            <span>{{ movie.rating }}/5</span>
+                                        </div>
+                                        <div class="review-date">
+                                            Reviewed on {{ movie.created_at.strftime('%b %d, %Y') }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {% if movie.review %}
+                                <div class="review-content">
+                                    <p>{{ movie.review }}</p>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="review-actions">
+                                    <form action="{{ url_for('profile_remove_rating', item_id=movie.rating_id) }}" method="POST" class="remove-form">
+                                        <button type="submit" class="text-button" title="Delete review">
+                                            <i class="fas fa-trash"></i> Delete Review
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-content">
+                            <i class="fas fa-star"></i>
+                            <h3>You haven't reviewed any movies yet</h3>
+                            <p>Rate and review movies to share your opinions and keep track of what you've watched.</p>
+                            <a href="{{ url_for('landing') }}" class="primary-button">Find Movies to Review</a>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="tab-content" id="edit-tab">
+                    <form action="{{ url_for('profile') }}" method="POST" enctype="multipart/form-data" class="profile-form">
+                        <div class="form-group">
+                            <label for="bio">Bio</label>
+                            <textarea id="bio" name="bio" rows="3" placeholder="Tell us about yourself">{{ user_profile.bio if user_profile else '' }}</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="preferred_genres">Preferred Genres</label>
+                            <div class="genre-container">
+                                {% for genre in genres %}
+                                <label class="genre-checkbox">
+                                    <input type="checkbox" name="preferred_genres" value="{{ genre.id }}" 
+                                          {% if selected_genre_ids and genre.id|string in selected_genre_ids %}checked{% endif %}>
+                                    <span>{{ genre.name }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="date_of_birth">Date of Birth</label>
+                            <input type="date" id="date_of_birth" name="date_of_birth" 
+                                   value="{{ user_profile.date_of_birth if user_profile else '' }}"
+                                   style="width: 100%; padding: 12px; background: #3d3d3d; border: none; border-radius: 8px; color: white;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <select id="country" name="country" style="width: 100%; padding: 12px; background: #3d3d3d; border: none; border-radius: 8px; color: white;">
+                                <option value="">Select your country</option>
+                                {% for country in countries %}
+                                <option value="{{ country }}" 
+                                        {% if user_profile and user_profile.country == country %}selected{% endif %}>
+                                    {{ country }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="primary-button">Save Changes</button>
+                            <button type="button" class="secondary-button" id="cancel-edit">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Tab functionality
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                // Hide all tab contents
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Show the corresponding tab content
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+        
+        // Cancel edit button
+        document.getElementById('cancel-edit').addEventListener('click', () => {
+            // Switch back to profile tab
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabButtons[0].classList.add('active');
+            
+            tabContents.forEach(content => content.classList.remove('active'));
+            document.getElementById('profile-tab').classList.add('active');
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Watchlist - Movie App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="/">Movie App</a>
+            </div>
+            <div class="search-container">
+                <form action="/search" method="GET">
+                    <input type="text" name="query" placeholder="Search for movies or TV shows...">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="#">Movies</a></li>
+                    <li><a href="#">TV Shows</a></li>
+                    {% if session.get('user') %}
+                        <li><a href="/watchlist" class="active">Watchlist</a></li>
+                        <li class="user-menu">
+                            <span class="user-email">{{ session['user']['email'] }}</span>
+                            <a href="/logout" class="logout-btn">Logout</a>
+                        </li>
+                    {% else %}
+                        <li><a href="/login" class="auth-link login">Sign In</a></li>
+                        <li><a href="/signup" class="auth-link signup">Sign Up</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="app-container">
+        <nav class="sidebar">
+            <div class="nav-item">
+                <a href="/">Browse</a>
+            </div>
+            <div class="nav-item">
+                <a href="#">Movies</a>
+            </div>
+            <div class="nav-item">
+                <a href="#">TV Shows</a>
+            </div>
+            {% if session.get('user') %}
+            <div class="nav-item active">
+                <a href="/watchlist">My Watchlist</a>
+            </div>
+            {% endif %}
+        </nav>
+        
+        <main class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <div class="watchlist-header">
+                <h1>My Watchlist</h1>
+                {% if user_profile %}
+                <div class="user-profile-preview">
+                    <div class="profile-info">
+                        <p>{{ user_profile.bio|truncate(50) }}</p>
+                        {% if user_profile.preferred_genres %}
+                        <div class="user-genres">
+                            {% for genre_name in user_genres %}
+                            <span class="genre-tag">{{ genre_name }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <a href="/profile" class="edit-profile-link">Edit Profile</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if watchlist_items %}
+            <section class="section">
+                <div class="movie-grid">
+                    {% for item in watchlist_items %}
+                    <div class="movie-card">
+                        <div class="movie-poster">
+                            <img src="https://image.tmdb.org/t/p/w300{{ item.poster_path }}" alt="{{ item.title }}">
+                            <button class="remove-watchlist" data-id="{{ item.id }}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="movie-info">
+                            <h3>{{ item.title }}</h3>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>{{ item.vote_average|round(1) }}/10</span>
+                            </div>
+                            <div class="watchlist-date">
+                                Added: {{ item.added_date.strftime('%b %d, %Y') }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% else %}
+            <div class="empty-watchlist">
+                <div class="empty-message">
+                    <i class="fas fa-film"></i>
+                    <h2>Your watchlist is empty</h2>
+                    <p>Browse movies and click the "Add to Watchlist" button to save them here.</p>
+                    <a href="/" class="browse-btn">Browse Movies</a>
+                </div>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+
+    <script>
+        // JavaScript to handle removing items from watchlist
+        document.querySelectorAll('.remove-watchlist').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const id = button.dataset.id;
+                try {
+                    const response = await fetch(`/watchlist/remove/${id}`, {
+                        method: 'POST'
+                    });
+                    if (response.ok) {
+                        // Remove the movie card from the DOM
+                        button.closest('.movie-card').remove();
+                        
+                        // If no more items, show empty state
+                        if (document.querySelectorAll('.movie-card').length === 0) {
+                            location.reload();
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error removing from watchlist:', error);
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
