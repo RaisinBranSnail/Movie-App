@@ -1,3 +1,11 @@
+"""
+FILE: app.py
+CONTRIBUTORS:
+- Caleb Stark: Initial TMDB API integration, landing and detail page routes
+- Brandon Grimaldo: Authentication system, database integration, watchlist/ratings functionality, 
+                   profile management, search, movies and TV routes
+"""
+
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import os
 from dotenv import load_dotenv
@@ -6,20 +14,20 @@ import requests
 import json
 from datetime import datetime
 
-# Loads from .env
+# Loads from .env - Implemented by: Caleb Stark
 load_dotenv()
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_ANON_KEY")
 tmdb_key = os.getenv("TMDB_API_KEY")
 tmdb_base_url = os.getenv("TMDB_BASE_URL")
 
-# Initialize Supabase client
+# Initialize Supabase client - Configured by: Caleb Stark, Extended by: Brandon Grimaldo
 supabase: Client = create_client(supabase_url, supabase_key)
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Change this to a secure random key in production
 
-# Get data from api
+# Get data from api - Implemented by: Caleb Stark
 def tmdb_get(path, params=None):
     params = params or {}
     params["api_key"] = tmdb_key
@@ -27,6 +35,7 @@ def tmdb_get(path, params=None):
     resp.raise_for_status()
     return resp.json()
 
+# Enhanced API data fetching - Implemented by: Caleb Stark
 def tmdb_get_data():
     return {
         "popular_movies": tmdb_get("movie/popular", {"page": 1}),
@@ -35,10 +44,11 @@ def tmdb_get_data():
         "top_rated_tv_shows": tmdb_get("tv/top_rated", {"page": 1})
     }
 
+# Movie genres function - Implemented by: Brandon Grimaldo
 def get_movie_genres():
     return tmdb_get("genre/movie/list")["genres"]
 
-# List of countries for the profile setup form
+# List of countries for the profile setup form - Implemented by: Brandon Grimaldo
 COUNTRIES = [
     "United States", "Canada", "United Kingdom", "Australia", "India", 
     "Germany", "France", "Japan", "China", "Brazil", "Mexico", "Italy",
@@ -46,11 +56,13 @@ COUNTRIES = [
     "Denmark", "Finland", "New Zealand", "Ireland", "Belgium", "Switzerland"
 ]
 
+# Landing page route - Implemented by: Caleb Stark
 @app.route('/')
 def landing():
     tmdb_data = tmdb_get_data()
     return render_template('landing.html', tmdb_data=tmdb_data)
 
+# Search route - Implemented by: Brandon Grimaldo
 @app.route('/search')
 def search():
     query = request.args.get('query', '')
@@ -71,10 +83,13 @@ def search():
     
     return render_template('search.html', search_data=search_data)
 
+# Detail page route - Implemented by: Caleb Stark
 @app.route('/detail/<title>')
 def detail(title):
     tmdb_data = tmdb_get_data()
     return render_template('detail.html', title=title, tmdb_data=tmdb_data)
+
+# --- Authentication Routes (All implemented by: Brandon Grimaldo) ---
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -136,6 +151,8 @@ def signup():
             flash(f'Registration failed: {str(e)}', 'error')
     
     return render_template('signup.html')
+
+# --- Profile Management Routes (All implemented by: Brandon Grimaldo) ---
 
 @app.route('/profile-setup', methods=['GET', 'POST'])
 def profile_setup():

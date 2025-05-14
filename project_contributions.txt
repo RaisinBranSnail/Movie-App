@@ -1,0 +1,99 @@
+# MOVIE APP PROJECT CONTRIBUTIONS
+
+## CALEB STARK'S CONTRIBUTIONS
+
+### Frontend Development:
+
+#### landing.html:
+- Created the initial landing page structure
+- Implemented movie grid display in the landing page
+- Added navigation sidebar with "Browse" active item
+- Set up the URL links for the detail page
+- Added dynamic rendering of movie data from TMDB API
+- Implemented templating to display different movie categories
+- Added proper formatting for movie titles and ratings
+
+#### landing.css:
+- Developed the dark theme color scheme with red/orange accents
+- Created styling for navigation items and active states
+- Styled the movie card grid layout
+- Added hover effects for movie cards
+- Implemented responsive design elements
+- Styled search bar and auth link elements
+- Added proper spacing and margins throughout the interface
+
+#### detail.html:
+- Created the entire movie detail page template
+- Implemented the layout to display individual movie information
+- Set up navigation sidebar consistent with landing page
+- Added dynamic content rendering from TMDB API data
+- Included movie poster, title, rating, and overview display
+
+#### detail.css:
+- Comprehensive styling for the movie detail page
+- Created card layout for movie details
+- Styled poster display with proper sizing
+- Added typography styles for movie information
+- Implemented consistent navigation and search elements
+- Maintained the app's visual identity across pages
+
+### Backend Integration:
+
+#### app.py (Partial):
+- Implemented TMDB API integration:
+  - Created tmdb_get function to fetch movie data
+  - Added tmdb_get_data function to fetch multiple categories
+- Set up routing for:
+  - Landing page (/)
+  - Detail page (/detail/<title>)
+- Added rendering logic to pass movie data to templates
+- Implemented environment variable loading for API keys
+
+## BRANDON GRIMALDO'S CONTRIBUTIONS
+
+### Files Created/Developed:
+
+#### app.py (Major portions):
+- Implemented the entire authentication system:
+  - Login route and functionality (/login)
+  - Signup route and functionality (/signup)
+  - Logout route and functionality (/logout)
+  - Session management
+- Developed Supabase integration:
+  - Database initialization and client setup
+  - User profile storage and retrieval
+- Created watchlist functionality:
+  - Add to watchlist route and logic (/watchlist/add/<movie_id>)
+  - Remove from watchlist route and logic (/watchlist/remove/<item_id>)
+  - Watchlist display route (/watchlist)
+  - Profile watchlist removal (/profile/watchlist/remove/<item_id>)
+- Implemented rating system:
+  - Add/edit ratings route (/api/ratings)
+  - Rating retrieval logic
+  - Profile rating removal (/profile/rating/remove/<item_id>)
+- Profile management:
+  - Profile setup routes (/profile-setup)
+  - Alternative profile setup methods (/profile-setup-rpc, /profile-setup-service)
+  - Profile display and update route (/profile)
+- Movies and TV routes:
+  - Movies page route (/movies)
+  - TV shows page route (/tv)
+- Search route:
+  - Enhanced search functionality (/search)
+
+#### Template Files:
+- login.html - Complete authentication template with form
+- signup.html - User registration form and validation
+- profile.html - User profile display and management
+- profile_setup.html - Initial profile setup interface
+- watchlist.html - Template for displaying user's watchlist
+- search.html - Results page for movie searches
+- movies.html - Dedicated page for browsing movies
+- tv_shows.html - Dedicated page for browsing TV shows
+
+#### Project Configuration:
+- requirements.txt - Python dependencies
+- tmdb_API.py - API key configuration
+- .gitignore - Git configuration
+- readme.md - Project documentation
+- package-lock.json - Package dependencies

@@ -1,3 +1,10 @@
+<!--
+FILE: landing.html
+CONTRIBUTORS:
+- Caleb Stark: Created initial structure, navigation, movie grid, and dynamic content rendering
+- Brandon Grimaldo: Integrated with backend authentication, added header navigation, user profile dropdown, and flash messages
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+    <!-- Main header with search and navigation - Implemented by: Brandon Grimaldo -->
     <header class="main-header">
         <div class="header-container">
             <div class="logo">
@@ -24,6 +32,7 @@
                     <li><a href="/" class="active">Home</a></li>
                     <li><a href="{{ url_for('movies') }}">Movies</a></li>
                     <li><a href="{{ url_for('tv_shows') }}">TV Shows</a></li>
+                    <!-- User authentication display - Implemented by: Brandon Grimaldo -->
                     {% if session.get('user') %}
                         <li><a href="{{ url_for('watchlist') }}">Watchlist</a></li>
                         <li class="user-menu">
@@ -42,11 +51,13 @@
         </div>
     </header>
 
+    <!-- App container and sidebar - Initial structure by: Caleb Stark, Enhanced by: Brandon Grimaldo -->
     <div class="app-container">
         <nav class="sidebar">
             <div class="nav-item active">
                 <a href="/">Browse</a>
             </div>
+            <!-- Extended navigation - Added by: Brandon Grimaldo -->
             <div class="nav-item">
                 <a href="{{ url_for('movies') }}">Movies</a>
             </div>
@@ -64,6 +75,7 @@
         </nav>
         
         <main class="content">
+            <!-- Flash messages - Implemented by: Brandon Grimaldo -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     <div class="flash-messages">
@@ -74,12 +86,14 @@
                 {% endif %}
             {% endwith %}
             
+            <!-- Movie categories display - Initial implementation by: Caleb Stark -->
             {% for category_name, category_data in tmdb_data.items() %}
             <section class="section">
                 <div class="section-header">
                     <h2>{{ category_name.replace('_', ' ').title() }}</h2>
                 </div>
                 <div class="movie-grid">
+                    <!-- Movie cards with linking to detail page - Implementation by: Caleb Stark -->
                     {% for m in category_data['results'][0:18] %}
                     <a href="{{ url_for('detail', title=m.title|default(m.name)) }}">  
                     <div class="movie-card">

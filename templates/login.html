@@ -1,3 +1,9 @@
+<!--
+FILE: login.html
+CONTRIBUTORS:
+- Brandon Grimaldo: Created entire file, including structure, styling, and form functionality
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +17,7 @@
         <div class="auth-form">
             <h1>Login</h1>
             
+            <!-- Flash messages - Implemented by: Brandon Grimaldo -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     <div class="flash-messages">
@@ -21,6 +28,7 @@
                 {% endif %}
             {% endwith %}
             
+            <!-- Login form - Implemented by: Brandon Grimaldo -->
             <form action="/login" method="POST">
                 <div class="form-group">
                     <label for="email">Email</label>

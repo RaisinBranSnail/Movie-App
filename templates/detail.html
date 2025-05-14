@@ -1,3 +1,12 @@
+<!--
+FILE: detail.html
+CONTRIBUTORS:
+- Caleb Stark: Created initial structure, movie detail card, and dynamic content display
+- Brandon Grimaldo: Integrated backend authentication, added watchlist/rating functionality, 
+                   header navigation, and JavaScript functionality
+- Brandon Grimaldo: Created movie detail page with ratings, reviews, and cast information
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +17,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+    <!-- Main header - Implemented by: Brandon Grimaldo -->
     <header class="main-header">
         <div class="header-container">
             <div class="logo">
@@ -24,6 +34,7 @@
                     <li><a href="/">Home</a></li>
                     <li><a href="#">Movies</a></li>
                     <li><a href="#">TV Shows</a></li>
+                    <!-- User auth display - By: Brandon Grimaldo -->
                     {% if session.get('user') %}
                         <li><a href="/watchlist">Watchlist</a></li>
                         <li class="user-menu">
@@ -39,6 +50,7 @@
         </div>
     </header>
 
+    <!-- App container - Initial by: Caleb Stark, Enhanced by: Brandon Grimaldo -->
     <div class="app-container">
         <nav class="sidebar">
             <div class="nav-item">
@@ -58,6 +70,7 @@
         </nav>
         
         <main class="content">
+            <!-- Flash messages - By: Brandon Grimaldo -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     <div class="flash-messages">
@@ -68,6 +81,7 @@
                 {% endif %}
             {% endwith %}
             
+            <!-- Movie detail card - By: Caleb Stark, Enhanced by: Brandon Grimaldo -->
             <div class="detail-card">
                 {% for category_name, category_data in tmdb_data.items() %}
                     {% for m in category_data['results'][0:18] %}
@@ -89,6 +103,7 @@
                                 </div>
                             </div>
                             
+                            <!-- Watchlist functionality - By: Brandon Grimaldo -->
                             <div class="detail-actions">
                                 {% if session.get('user') %}
                                 <button class="watchlist-btn" data-movie-id="{{ m.id }}">
@@ -106,7 +121,7 @@
                                 <p>{{ m.overview }}</p>
                             </div>
                             
-                            <!-- Rating section -->
+                            <!-- Rating section - By: Brandon Grimaldo -->
                             {% if session.get('user') %}
                             <div class="rating-section">
                                 <h3>Your Rating</h3>
@@ -133,6 +148,7 @@
         </main>
     </div>
 
+    <!-- JavaScript functionality - By: Brandon Grimaldo -->
     <script>
         // Watchlist add functionality
         const watchlistBtn = document.querySelector('.watchlist-btn');
