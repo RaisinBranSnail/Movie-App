@@ -2,7 +2,7 @@ Name: movie app cst 205
 Names of team members: Brandon Grimaldo, Caleb Stark, Eashwar Sridharan, Janira Martinez-Amador
 Class: cst 205
 Date: April 16th 2025
-
+Date of completion: May 16th 2025
 ## How to run program
 
 ### Setup Instructions
